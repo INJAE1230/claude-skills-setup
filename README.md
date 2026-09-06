@@ -10,7 +10,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 
 전역(`~/.claude/skills`)에 설치되며, Claude Code를 재시작하면 스킬 목록에 나타납니다.
 
-## 설치되는 스킬 (12개)
+## 설치되는 스킬 (14개)
 
 | 스킬 | 출처 | 용도 |
 | --- | --- | --- |
@@ -26,6 +26,8 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | `prompt-engineer` | `jeffallan/claude-skills` | 프롬프트 작성·리팩터링·평가 |
 | `design-taste-frontend` | `leonxlnx/taste-skill` | 랜딩·포트폴리오 프런트엔드 디자인 |
 | `image-to-code` | `leonxlnx/taste-skill` | 디자인 이미지를 먼저 만들고 그대로 코드로 구현 |
+| `accessibility-compliance` | `wshobson/agents` | WCAG 2.2 접근성 준수·ARIA 패턴 구현 |
+| `design-md` | `nexu-io/open-design` | DESIGN.md 디자인 토큰·시각 규칙 문서 작성 |
 
 ## 참고
 
