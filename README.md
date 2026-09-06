@@ -33,3 +33,17 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 
 - 설치 후 확인: `Get-ChildItem $HOME\.claude\skills`
 - 개별 스킬만 다시 설치하려면 `install-skills.ps1`에서 해당 줄만 실행하면 됩니다.
+
+## 검증
+
+설치 목록이 실제 설치 상태와 어긋났는지 확인합니다.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\verify-skills.ps1
+```
+
+`install-skills.ps1`, `README.md` 표, 실제 `~/.claude/skills` 세 곳을 대조해
+빠진 스킬·설치 안 된 스킬·개수 표기 불일치를 짚어 줍니다. 일치하면 종료 코드 0,
+어긋나면 1을 반환하므로 pre-commit 훅이나 CI에 그대로 걸 수 있습니다.
+
+플러그인이 제공하는 스킬은 `~/.claude/plugins` 아래에 있어 검사 대상이 아닙니다.
