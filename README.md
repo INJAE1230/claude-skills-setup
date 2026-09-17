@@ -1,6 +1,6 @@
 # claude-skills-setup
 
-새 PC나 새 환경에서 Claude Code 스킬을 한 번에 복구하기 위한 설치 스크립트입니다.
+새 PC나 새 환경에서 Claude Code 스킬·플러그인을 한 번에 복구하기 위한 설치 스크립트입니다.
 
 ## 사용법
 
@@ -10,7 +10,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 
 전역(`~/.claude/skills`)에 설치되며, Claude Code를 재시작하면 스킬 목록에 나타납니다.
 
-## 설치되는 스킬 (14개)
+## 설치되는 스킬 (18개)
 
 | 스킬 | 출처 | 용도 |
 | --- | --- | --- |
@@ -28,10 +28,25 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | `image-to-code` | `leonxlnx/taste-skill` | 디자인 이미지를 먼저 만들고 그대로 코드로 구현 |
 | `accessibility-compliance` | `wshobson/agents` | WCAG 2.2 접근성 준수·ARIA 패턴 구현 |
 | `design-md` | `nexu-io/open-design` | DESIGN.md 디자인 토큰·시각 규칙 문서 작성 |
+| `ux-heuristics` | `wondelai/skills` | 닐슨 휴리스틱 기반 사용성 점검 |
+| `handoff` | `mattpocock/skills` | 작업 인수인계 문서 작성 |
+| `archify` | `tt-a1i/archify` | 아키텍처·워크플로·시퀀스 다이어그램(HTML) |
+| `archify-review` | `tt-a1i/archify` | Archify 이슈·PR·코드 리뷰 |
+
+## 설치되는 플러그인 (4개)
+
+| 플러그인 | 마켓플레이스 | 용도 |
+| --- | --- | --- |
+| vercel@claude-plugins-official | `anthropics/claude-plugins-official` | Vercel·Next.js·AI SDK 가이드 |
+| humanize-korean@im-not-ai | `epoko77-ai/im-not-ai` | AI 티 나는 한글 윤문 |
+| ponytail@ponytail | `DietrichGebert/ponytail` | 과설계 방지(최소 구현) 모드 |
+| claude-mem@thedotmack | `thedotmack/claude-mem` | 세션 간 기억 저장·검색 |
+
+플러그인 표 첫 칸에 백틱을 쓰지 않는 이유: `verify-skills.ps1` 이 백틱으로 시작하는 줄을 스킬로 센다.
 
 ## 참고
 
-- 설치 후 확인: `Get-ChildItem $HOME\.claude\skills`
+- 설치 후 확인: `Get-ChildItem $HOME\.claude\skills` · `claude plugin list`
 - 개별 스킬만 다시 설치하려면 `install-skills.ps1`에서 해당 줄만 실행하면 됩니다.
 
 ## 검증
