@@ -57,8 +57,12 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 powershell -ExecutionPolicy Bypass -File .\verify-skills.ps1
 ```
 
-`install-skills.ps1`, `README.md` 표, 실제 `~/.claude/skills` 세 곳을 대조해
-빠진 스킬·설치 안 된 스킬·개수 표기 불일치를 짚어 줍니다. 일치하면 종료 코드 0,
-어긋나면 1을 반환하므로 pre-commit 훅이나 CI에 그대로 걸 수 있습니다.
+`install-skills.ps1`, `README.md` 표, 실제 설치 상태 세 곳을 대조합니다.
 
-플러그인이 제공하는 스킬은 `~/.claude/plugins` 아래에 있어 검사 대상이 아닙니다.
+- **스킬**: `~/.claude/skills` 와 대조 — 빠진 스킬·설치 안 된 스킬
+- **플러그인**: `~/.claude/plugins/installed_plugins.json` 과 대조 — 빠진 플러그인·설치 안 된 플러그인,
+  그리고 **마켓플레이스 등록 줄(`claude plugin marketplace add`)이 빠진 플러그인**
+  (새 PC에는 마켓이 등록돼 있지 않아 그 줄이 없으면 설치가 실패합니다)
+- **개수 표기**: 스크립트·README에 적힌 스킬·플러그인 개수
+
+일치하면 종료 코드 0, 어긋나면 1을 반환하므로 pre-commit 훅이나 CI에 그대로 걸 수 있습니다.
