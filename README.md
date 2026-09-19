@@ -33,7 +33,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | `archify` | `tt-a1i/archify` | 아키텍처·워크플로·시퀀스 다이어그램(HTML) |
 | `archify-review` | `tt-a1i/archify` | Archify 이슈·PR·코드 리뷰 |
 
-## 설치되는 플러그인 (4개)
+## 설치되는 플러그인 (6개)
 
 | 플러그인 | 마켓플레이스 | 용도 |
 | --- | --- | --- |
@@ -41,6 +41,8 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | humanize-korean@im-not-ai | `epoko77-ai/im-not-ai` | AI 티 나는 한글 윤문 |
 | ponytail@ponytail | `DietrichGebert/ponytail` | 과설계 방지(최소 구현) 모드 |
 | claude-mem@thedotmack | `thedotmack/claude-mem` | 세션 간 기억 저장·검색 |
+| prompts.chat@prompts.chat | `f/prompts.chat` | prompts.chat 프롬프트·스킬 검색·저장 |
+| claude-code-setup@claude-plugins-official | `anthropics/claude-plugins-official` | 코드베이스 분석 후 훅·스킬·MCP 자동화 추천 |
 
 플러그인 표 첫 칸에 백틱을 쓰지 않는 이유: `verify-skills.ps1` 이 백틱으로 시작하는 줄을 스킬로 센다.
 

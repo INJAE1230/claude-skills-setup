@@ -1,5 +1,5 @@
 # install-skills.ps1
-# Claude Code 전역 스킬 18개 · 플러그인 4개 일괄 설치 스크립트
+# Claude Code 전역 스킬 18개 · 플러그인 6개 일괄 설치 스크립트
 #
 # 사용법:
 #   powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
@@ -37,16 +37,19 @@ npx skills add tt-a1i/archify --skill archify-review -g -y -a claude-code
 
 # --- 플러그인 (claude plugin) ---
 # 마켓플레이스를 먼저 등록하고 그 이름으로 설치한다. 이미 등록돼 있으면 오류만 내고 넘어간다.
-Write-Host "플러그인 4개 설치를 시작합니다..." -ForegroundColor Cyan
+Write-Host "플러그인 6개 설치를 시작합니다..." -ForegroundColor Cyan
 
 claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin marketplace add epoko77-ai/im-not-ai
 claude plugin marketplace add DietrichGebert/ponytail
 claude plugin marketplace add thedotmack/claude-mem
+claude plugin marketplace add f/prompts.chat
 
 claude plugin install vercel@claude-plugins-official
 claude plugin install humanize-korean@im-not-ai
 claude plugin install ponytail@ponytail
 claude plugin install claude-mem@thedotmack
+claude plugin install prompts.chat@prompts.chat
+claude plugin install claude-code-setup@claude-plugins-official
 
 Write-Host "설치 완료. 확인: Get-ChildItem $HOME\.claude\skills / claude plugin list" -ForegroundColor Green
