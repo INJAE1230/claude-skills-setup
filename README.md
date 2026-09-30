@@ -10,7 +10,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 
 전역(`~/.claude/skills`)에 설치되며, Claude Code를 재시작하면 스킬 목록에 나타납니다.
 
-## 설치되는 스킬 (18개)
+## 설치되는 스킬 (21개)
 
 | 스킬 | 출처 | 용도 |
 | --- | --- | --- |
@@ -30,10 +30,13 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | `design-md` | `nexu-io/open-design` | DESIGN.md 디자인 토큰·시각 규칙 문서 작성 |
 | `ux-heuristics` | `wondelai/skills` | 닐슨 휴리스틱 기반 사용성 점검 |
 | `handoff` | `mattpocock/skills` | 작업 인수인계 문서 작성 |
+| `grill-with-docs` | `mattpocock/skills` | 계획·설계를 집요하게 캐물어 다듬고 ADR·용어집 작성 |
+| `tdd` | `mattpocock/skills` | 테스트 우선(레드-그린-리팩터) 개발 |
+| `diagnosing-bugs` | `mattpocock/skills` | 어려운 버그·성능 회귀 진단 루프 |
 | `archify` | `tt-a1i/archify` | 아키텍처·워크플로·시퀀스 다이어그램(HTML) |
 | `archify-review` | `tt-a1i/archify` | Archify 이슈·PR·코드 리뷰 |
 
-## 설치되는 플러그인 (6개)
+## 설치되는 플러그인 (7개)
 
 | 플러그인 | 마켓플레이스 | 용도 |
 | --- | --- | --- |
@@ -43,6 +46,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | claude-mem@thedotmack | `thedotmack/claude-mem` | 세션 간 기억 저장·검색 |
 | prompts.chat@prompts.chat | `f/prompts.chat` | prompts.chat 프롬프트·스킬 검색·저장 |
 | claude-code-setup@claude-plugins-official | `anthropics/claude-plugins-official` | 코드베이스 분석 후 훅·스킬·MCP 자동화 추천 |
+| caveman@caveman | `JuliusBrussee/caveman` | 응답을 짧게 압축하는 모드 · cavecrew 서브에이전트 |
 
 플러그인 표 첫 칸에 백틱을 쓰지 않는 이유: `verify-skills.ps1` 이 백틱으로 시작하는 줄을 스킬로 센다.
 
