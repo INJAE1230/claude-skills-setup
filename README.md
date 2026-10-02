@@ -10,7 +10,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 
 전역(`~/.claude/skills`)에 설치되며, Claude Code를 재시작하면 스킬 목록에 나타납니다.
 
-## 설치되는 스킬 (21개)
+## 설치되는 스킬 (22개)
 
 | 스킬 | 출처 | 용도 |
 | --- | --- | --- |
@@ -35,6 +35,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | `diagnosing-bugs` | `mattpocock/skills` | 어려운 버그·성능 회귀 진단 루프 |
 | `archify` | `tt-a1i/archify` | 아키텍처·워크플로·시퀀스 다이어그램(HTML) |
 | `archify-review` | `tt-a1i/archify` | Archify 이슈·PR·코드 리뷰 |
+| `impeccable` | `pbakaus/impeccable` | 프런트엔드 UI 디자인·리디자인·비평·감사·다듬기 |
 
 ## 설치되는 플러그인 (7개)
 

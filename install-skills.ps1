@@ -1,5 +1,5 @@
 # install-skills.ps1
-# Claude Code 전역 스킬 21개 · 플러그인 7개 일괄 설치 스크립트
+# Claude Code 전역 스킬 22개 · 플러그인 7개 일괄 설치 스크립트
 #
 # 사용법:
 #   powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
@@ -9,7 +9,7 @@
 #   -y              프롬프트 자동 확인
 #   -a claude-code  대상 에이전트를 Claude Code로 지정
 
-Write-Host "Claude Code 스킬 21개 설치를 시작합니다..." -ForegroundColor Cyan
+Write-Host "Claude Code 스킬 22개 설치를 시작합니다..." -ForegroundColor Cyan
 
 # --- Anthropic 공식 (anthropics/skills) ---
 npx skills add anthropics/skills --skill mcp-builder -g -y -a claude-code
@@ -37,6 +37,7 @@ npx skills add mattpocock/skills --skill tdd -g -y -a claude-code
 npx skills add mattpocock/skills --skill diagnosing-bugs -g -y -a claude-code
 npx skills add tt-a1i/archify --skill archify -g -y -a claude-code
 npx skills add tt-a1i/archify --skill archify-review -g -y -a claude-code
+npx skills add pbakaus/impeccable --skill impeccable -g -y -a claude-code
 
 # --- 플러그인 (claude plugin) ---
 # 마켓플레이스를 먼저 등록하고 그 이름으로 설치한다. 이미 등록돼 있으면 오류만 내고 넘어간다.
