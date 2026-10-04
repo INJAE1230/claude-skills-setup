@@ -59,9 +59,13 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | --- | --- | --- |
 | code-reviewer | `jeffallan/claude-skills` | Gen 감사 CRITICAL |
 | deploy-to-vercel | `vercel-labs/agent-skills` | 프로젝트 소스를 외부 엔드포인트(`claude-skills-deploy.vercel.com`)로 인증 없이 업로드하는 경로 |
+| find-skills | `vercel-labs/skills` | `npx skills add` 로 제3자 저장소 코드 설치를 유도하는 공급망 진입점 |
 
 제거는 `npx skills remove` 로 하고, `~/.agents/.skill-lock.json` 에 남은 엔트리까지
 같이 지웁니다. 록 엔트리를 남겨두면 `npx skills update` 가 제거한 스킬을 다시 끌어옵니다.
+
+설치 위치는 `~/.claude/skills` 와 `~/.agents/skills` 두 곳이라 양쪽을 다 확인합니다
+(`find-skills` 는 `~/.agents/skills` 에만 설치돼 `~/.claude/skills` 만 보면 못 찾습니다).
 
 제거 표 첫 칸에도 백틱을 쓰지 않습니다 — 위와 같은 이유로 `verify-skills.ps1` 이
 설치 대상 스킬로 오인합니다.

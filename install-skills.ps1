@@ -41,11 +41,20 @@ function Invoke-Step {
 # 남아 있을 수 있어, 설치 전에 먼저 지운다. 없으면 조용히 넘어간다.
 #   code-reviewer     — Gen 감사 CRITICAL
 #   deploy-to-vercel  — 프로젝트 소스를 외부 엔드포인트로 업로드하는 경로
-$removeSkills = @('code-reviewer', 'deploy-to-vercel')
+#   find-skills       — npx skills add 로 제3자 저장소 코드 설치를 유도하는 공급망 진입점
+$removeSkills = @('code-reviewer', 'deploy-to-vercel', 'find-skills')
+
+# 스킬은 ~/.claude/skills 뿐 아니라 ~/.agents/skills 에도 설치된다.
+# (find-skills 는 .agents 쪽에만 있어서 .claude 만 보면 영영 못 찾는다.)
+$skillRoots = @(
+    (Join-Path $HOME '.claude\skills'),
+    (Join-Path $HOME '.agents\skills')
+)
 
 Write-Host '제거 대상 스킬을 확인합니다...' -ForegroundColor Cyan
 $toRemove = @($removeSkills | Where-Object {
-    Test-Path (Join-Path $HOME ".claude\skills\$_\SKILL.md")
+    $name = $_
+    @($skillRoots | Where-Object { Test-Path (Join-Path $_ "$name\SKILL.md") }).Count -gt 0
 })
 if ($toRemove.Count -gt 0) {
     Write-Host "  제거: $($toRemove -join ', ')" -ForegroundColor Yellow
