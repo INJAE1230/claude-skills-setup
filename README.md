@@ -4,11 +4,49 @@
 
 ## 사용법
 
+전역(`~/.claude/skills`)에 설치되며, Claude Code를 재시작하면 스킬 목록에 나타납니다.
+
+### 실행 전 체크
+
+- **Claude Code와 VS Code를 닫습니다.** 스킬 디렉터리를 쓰는 중이면 충돌합니다.
+- `git`, Node.js(`npx`), `claude` CLI 가 설치돼 있어야 합니다. 없으면 해당 줄이
+  실패 목록에 뜨고 종료 코드 1로 끝납니다(조용히 넘어가지 않습니다).
+
+### 처음 세팅하는 PC
+
 ```powershell
+cd $HOME
+git clone https://github.com/INJAE1230/claude-skills-setup.git
+cd $HOME\claude-skills-setup
 powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
+powershell -ExecutionPolicy Bypass -File .\verify-skills.ps1
 ```
 
-전역(`~/.claude/skills`)에 설치되며, Claude Code를 재시작하면 스킬 목록에 나타납니다.
+### 이미 받아둔 PC (노트북·회사 PC)
+
+```powershell
+cd $HOME\claude-skills-setup
+git pull
+powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
+powershell -ExecutionPolicy Bypass -File .\verify-skills.ps1
+```
+
+`./install-skills.ps1` 로 바로 실행하지 않는 이유: Windows 클라이언트의 실행 정책
+기본값이 `Restricted` 라서 `... cannot be loaded because running scripts is disabled
+on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -File` 형태로
+두 스크립트를 모두 실행합니다.
+
+### 정상 결과
+
+```
+스크립트 선언: 20개 / 실제 설치: 20개
+플러그인 선언: 7개 / 실제 설치: 7개
+
+일치합니다. 스킬 20개 · 플러그인 7개가 스크립트·README·실제 설치 상태에서 모두 동일합니다.
+```
+
+플러그인이 7개가 안 되면 Claude Code를 한 번 재시작하고 verify를 다시 돌립니다
+(설치 직후 `installed_plugins.json` 반영이 늦을 수 있습니다).
 
 ## 설치되는 스킬 (20개)
 
