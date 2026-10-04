@@ -10,7 +10,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 
 전역(`~/.claude/skills`)에 설치되며, Claude Code를 재시작하면 스킬 목록에 나타납니다.
 
-## 설치되는 스킬 (22개)
+## 설치되는 스킬 (20개)
 
 | 스킬 | 출처 | 용도 |
 | --- | --- | --- |
@@ -20,9 +20,7 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | `agent-browser` | `vercel-labs/agent-browser` | 브라우저 자동화 CLI |
 | `vercel-react-best-practices` | `vercel-labs/agent-skills` | React/Next.js 성능 최적화 |
 | `web-design-guidelines` | `vercel-labs/agent-skills` | UI 접근성·디자인 가이드라인 점검 |
-| `deploy-to-vercel` | `vercel-labs/agent-skills` | Vercel 배포 |
 | `brainstorming` | `obra/superpowers` | 아이디어를 설계·스펙으로 정리 |
-| `code-reviewer` | `jeffallan/claude-skills` | 코드 리뷰·보안 취약점 점검 |
 | `prompt-engineer` | `jeffallan/claude-skills` | 프롬프트 작성·리팩터링·평가 |
 | `design-taste-frontend` | `leonxlnx/taste-skill` | 랜딩·포트폴리오 프런트엔드 디자인 |
 | `image-to-code` | `leonxlnx/taste-skill` | 디자인 이미지를 먼저 만들고 그대로 코드로 구현 |
@@ -50,6 +48,23 @@ powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
 | caveman@caveman | `JuliusBrussee/caveman` | 응답을 짧게 압축하는 모드 · cavecrew 서브에이전트 |
 
 플러그인 표 첫 칸에 백틱을 쓰지 않는 이유: `verify-skills.ps1` 이 백틱으로 시작하는 줄을 스킬로 센다.
+
+## 제거된 스킬과 이유
+
+보안 점검에서 걸러낸 스킬입니다. 설치 목록에서 빼는 것만으로는 이미 설치된 PC가
+정리되지 않아, `install-skills.ps1` 시작 부분의 **제거 대상 스킬** 섹션이 설치 전에
+먼저 지웁니다. 해당 스킬이 없으면 조용히 넘어갑니다.
+
+| 스킬 | 출처 | 제거 이유 |
+| --- | --- | --- |
+| code-reviewer | `jeffallan/claude-skills` | Gen 감사 CRITICAL |
+| deploy-to-vercel | `vercel-labs/agent-skills` | 프로젝트 소스를 외부 엔드포인트(`claude-skills-deploy.vercel.com`)로 인증 없이 업로드하는 경로 |
+
+제거는 `npx skills remove` 로 하고, `~/.agents/.skill-lock.json` 에 남은 엔트리까지
+같이 지웁니다. 록 엔트리를 남겨두면 `npx skills update` 가 제거한 스킬을 다시 끌어옵니다.
+
+제거 표 첫 칸에도 백틱을 쓰지 않습니다 — 위와 같은 이유로 `verify-skills.ps1` 이
+설치 대상 스킬로 오인합니다.
 
 ## 참고
 
