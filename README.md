@@ -99,8 +99,11 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 | deploy-to-vercel | `vercel-labs/agent-skills` | 프로젝트 소스를 외부 엔드포인트(`claude-skills-deploy.vercel.com`)로 인증 없이 업로드하는 경로 |
 | find-skills | `vercel-labs/skills` | `npx skills add` 로 제3자 저장소 코드 설치를 유도하는 공급망 진입점 |
 
-제거는 `npx skills remove` 로 하고, `~/.agents/.skill-lock.json` 에 남은 엔트리까지
+제거는 `npx skills remove <스킬> -g -y` 로 하고, `~/.agents/.skill-lock.json` 에 남은 엔트리까지
 같이 지웁니다. 록 엔트리를 남겨두면 `npx skills update` 가 제거한 스킬을 다시 끌어옵니다.
+`-g` 가 없으면 현재 폴더(프로젝트 범위)만 보기 때문에 저장소 폴더에서 실행하면 전역 스킬이
+지워지지 않습니다. 제거 뒤에는 두 설치 위치에 폴더가 남았는지 직접 확인하고, 남아 있으면
+실패로 집계합니다.
 
 설치 위치는 `~/.claude/skills` 와 `~/.agents/skills` 두 곳이라 양쪽을 다 확인합니다
 (`find-skills` 는 `~/.agents/skills` 에만 설치돼 `~/.claude/skills` 만 보면 못 찾습니다).

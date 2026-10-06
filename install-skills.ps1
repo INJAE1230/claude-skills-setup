@@ -59,7 +59,20 @@ $toRemove = @($removeSkills | Where-Object {
 if ($toRemove.Count -gt 0) {
     Write-Host "  제거: $($toRemove -join ', ')" -ForegroundColor Yellow
     # npx skills remove 는 스킬 디렉터리를 지운다.
-    Invoke-Step -Label "스킬 제거 ($($toRemove -join ', '))" -Action { npx skills remove $toRemove }
+    # -g 필수: 없으면 현재 폴더(프로젝트 범위)만 보고 전역 스킬은 못 지운다.
+    # -y: 확인 프롬프트에서 멈추지 않게 한다.
+    Invoke-Step -Label "스킬 제거 ($($toRemove -join ', '))" -Action { npx skills remove $toRemove -g -y }
+
+    # 종료 코드만 믿지 않고 폴더가 실제로 사라졌는지 확인한다.
+    foreach ($name in $toRemove) {
+        $left = @($skillRoots | ForEach-Object { Join-Path $_ $name } | Where-Object { Test-Path $_ })
+        if ($left.Count -gt 0) {
+            Write-Host "  남아 있음: $($left -join ', ')" -ForegroundColor Red
+            $failed += "스킬 제거 확인 ($name): 폴더가 남아 있음 — $($left -join ', ')"
+        } else {
+            Write-Host "  제거 확인: $name" -ForegroundColor DarkGray
+        }
+    }
 } else {
     Write-Host '  제거할 스킬이 없습니다.' -ForegroundColor DarkGray
 }
