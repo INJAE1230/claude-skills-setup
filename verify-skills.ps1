@@ -53,6 +53,13 @@ foreach ($line in (Get-Content $ScriptPath -Encoding UTF8)) {
 }
 $declaredNames = @($declared.Keys | Sort-Object)
 
+# 제거 대상 목록($removeSkills = @(...)) — 이 스킬들은 "스크립트에 추가하라"고 안내하면 안 된다.
+$removeNames = @()
+$rm = [regex]::Match((Get-Content $ScriptPath -Raw -Encoding UTF8), '(?m)^\s*\$removeSkills\s*=\s*@\((?<list>[^)]*)\)')
+if ($rm.Success) {
+    $removeNames = @([regex]::Matches($rm.Groups['list'].Value, "'(?<n>[^']+)'") | ForEach-Object { $_.Groups['n'].Value })
+}
+
 # --- 2. 실제 설치된 스킬 ---
 # SKILL.md 가 있는 디렉터리만 스킬로 본다. 플러그인이 제공하는 스킬은
 # ~/.claude/plugins 아래에 있어 여기 잡히지 않으며, 이 스크립트의 대상도 아니다.
@@ -71,7 +78,15 @@ Write-Host "스크립트 선언: $($declaredNames.Count)개 / 실제 설치: $($
 $problems = 0
 
 # --- 3. 설치됐지만 스크립트에 없는 것 ---
-$missingFromScript = @($installed | Where-Object { -not $declared.ContainsKey($_) })
+$leftover = @($installed | Where-Object { $removeNames -contains $_ })
+if ($leftover.Count -gt 0) {
+    $problems += $leftover.Count
+    Write-Section "[제거 대상] 지워야 할 스킬이 남아 있음 ($($leftover.Count)개) — 스크립트에 다시 추가하지 말 것"
+    foreach ($name in $leftover) { Write-Host "  - $name" -ForegroundColor Yellow }
+    Write-Host '  install-skills.ps1 을 다시 실행하면 폴더와 록 파일 엔트리까지 지운다.' -ForegroundColor DarkGray
+}
+
+$missingFromScript = @($installed | Where-Object { -not $declared.ContainsKey($_) -and $removeNames -notcontains $_ })
 if ($missingFromScript.Count -gt 0) {
     $problems += $missingFromScript.Count
     Write-Section "[누락] 설치돼 있지만 install-skills.ps1에 없음 ($($missingFromScript.Count)개)"

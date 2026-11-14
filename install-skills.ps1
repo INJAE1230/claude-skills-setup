@@ -37,12 +37,14 @@ function Invoke-Step {
 # ---------------------------------------------------------------------------
 # 제거 대상 스킬
 # ---------------------------------------------------------------------------
-# 보안 점검에서 걸러낸 스킬이다. 예전 버전의 이 스크립트로 설치한 PC에도
-# 남아 있을 수 있어, 설치 전에 먼저 지운다. 없으면 조용히 넘어간다.
+# 보안 점검에서 걸러냈거나 출처 저장소에서 사라진 스킬이다. 예전 버전의 이 스크립트로
+# 설치한 PC에도 남아 있을 수 있어, 설치 전에 먼저 지운다. 없으면 조용히 넘어간다.
 #   code-reviewer     — Gen 감사 CRITICAL
 #   deploy-to-vercel  — 프로젝트 소스를 외부 엔드포인트로 업로드하는 경로
 #   find-skills       — npx skills add 로 제3자 저장소 코드 설치를 유도하는 공급망 진입점
-$removeSkills = @('code-reviewer', 'deploy-to-vercel', 'find-skills')
+#   image-to-code     — 출처 저장소(leonxlnx/taste-skill)에서 삭제됨
+# verify-skills.ps1 이 이 줄을 정규식으로 읽는다. 한 줄 형태를 유지할 것.
+$removeSkills = @('code-reviewer', 'deploy-to-vercel', 'find-skills', 'image-to-code')
 
 # 스킬은 ~/.claude/skills 뿐 아니라 ~/.agents/skills 에도 설치된다.
 # (find-skills 는 .agents 쪽에만 있어서 .claude 만 보면 영영 못 찾는다.)
