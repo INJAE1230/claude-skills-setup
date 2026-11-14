@@ -1,4 +1,4 @@
-# claude-skills-setup
+﻿# claude-skills-setup
 
 새 PC나 새 환경에서 Claude Code 스킬·플러그인을 한 번에 복구하기 위한 설치 스크립트입니다.
 
@@ -48,7 +48,7 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 플러그인이 7개가 안 되면 Claude Code를 한 번 재시작하고 verify를 다시 돌립니다
 (설치 직후 `installed_plugins.json` 반영이 늦을 수 있습니다).
 
-## 설치되는 스킬 (20개)
+## 설치되는 스킬 (19개)
 
 | 스킬 | 출처 | 용도 |
 | --- | --- | --- |
@@ -61,7 +61,6 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 | `brainstorming` | `obra/superpowers` | 아이디어를 설계·스펙으로 정리 |
 | `prompt-engineer` | `jeffallan/claude-skills` | 프롬프트 작성·리팩터링·평가 |
 | `design-taste-frontend` | `leonxlnx/taste-skill` | 랜딩·포트폴리오 프런트엔드 디자인 |
-| `image-to-code` | `leonxlnx/taste-skill` | 디자인 이미지를 먼저 만들고 그대로 코드로 구현 |
 | `accessibility-compliance` | `wshobson/agents` | WCAG 2.2 접근성 준수·ARIA 패턴 구현 |
 | `design-md` | `nexu-io/open-design` | DESIGN.md 디자인 토큰·시각 규칙 문서 작성 |
 | `ux-heuristics` | `wondelai/skills` | 닐슨 휴리스틱 기반 사용성 점검 |

@@ -1,5 +1,5 @@
-# install-skills.ps1
-# Claude Code 전역 스킬 20개 · 플러그인 7개 일괄 설치 스크립트
+﻿# install-skills.ps1
+# Claude Code 전역 스킬 19개 · 플러그인 7개 일괄 설치 스크립트
 #
 # 사용법:
 #   powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
@@ -100,7 +100,7 @@ if (Test-Path $lockPath) {
 # 스킬 설치
 # ---------------------------------------------------------------------------
 Write-Host ''
-Write-Host 'Claude Code 스킬 20개 설치를 시작합니다...' -ForegroundColor Cyan
+Write-Host 'Claude Code 스킬 19개 설치를 시작합니다...' -ForegroundColor Cyan
 
 # --- Anthropic 공식 (anthropics/skills) ---
 Invoke-Step -Label 'mcp-builder'    -Action { npx skills add anthropics/skills --skill mcp-builder -g -y -a claude-code }
@@ -116,7 +116,6 @@ Invoke-Step -Label 'web-design-guidelines'        -Action { npx skills add verce
 Invoke-Step -Label 'brainstorming'         -Action { npx skills add obra/superpowers --skill brainstorming -g -y -a claude-code }
 Invoke-Step -Label 'prompt-engineer'       -Action { npx skills add jeffallan/claude-skills --skill prompt-engineer -g -y -a claude-code }
 Invoke-Step -Label 'design-taste-frontend' -Action { npx skills add leonxlnx/taste-skill --skill design-taste-frontend -g -y -a claude-code }
-Invoke-Step -Label 'image-to-code'         -Action { npx skills add leonxlnx/taste-skill --skill image-to-code -g -y -a claude-code }
 Invoke-Step -Label 'accessibility-compliance' -Action { npx skills add wshobson/agents --skill accessibility-compliance -g -y -a claude-code }
 Invoke-Step -Label 'design-md'             -Action { npx skills add nexu-io/open-design --skill design-md -g -y -a claude-code }
 Invoke-Step -Label 'ux-heuristics'         -Action { npx skills add wondelai/skills --skill ux-heuristics -g -y -a claude-code }
