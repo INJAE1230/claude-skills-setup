@@ -1,5 +1,5 @@
 ﻿# verify-skills.ps1
-# install-skills.ps1 / README.md 와 실제 설치된 스킬(~/.claude/skills)·플러그인(~/.claude/plugins)이
+# install-skills.ps1 / README.md 와 실제 설치된 스킬(~/.claude/skills)·플러그인(~/.claude/plugins)·MCP(user 범위)가
 # 일치하는지 검사한다.
 #
 # 사용법:
@@ -248,10 +248,58 @@ if ($staleCounts.Count -gt 0) {
     foreach ($s in $staleCounts) { Write-Host "  - $s" -ForegroundColor Yellow }
 }
 
+# --- 8. MCP ---
+# 선언: `claude mcp add --scope user <이름> ...` · 실제: `claude mcp get <이름>` 종료 코드
+# ~/.claude.json 을 직접 읽지 않는다 — 대소문자만 다른 경로 키가 있으면 PS 5.1 ConvertFrom-Json 이 실패한다.
+# shortcut: 등록됐지만 스크립트에 없는 MCP 는 잡지 않는다(claude.ai·플러그인 MCP 와 섞여 나옴). MCP 가 늘면 claude mcp list 파싱 추가.
+$declaredMcp = @()
+foreach ($line in (Get-Content $ScriptPath -Encoding UTF8)) {
+    if ($line -match '^\s*#') { continue }
+    $m = [regex]::Match($line, 'claude\s+mcp\s+add\s+--scope\s+user\s+(?<name>[^\s'']+)')
+    if ($m.Success) { $declaredMcp += $m.Groups['name'].Value }
+}
+$declaredMcp = @($declaredMcp | Sort-Object -Unique)
+
+# 'Stop' 아래에서는 PS 5.1 이 네이티브 명령의 stderr 를 예외로 바꿔 스크립트가 멈춘다. 여기서만 Continue.
+$mcpMissing = @($declaredMcp | Where-Object { $ErrorActionPreference = 'Continue'; claude mcp get $_ *> $null; $LASTEXITCODE -ne 0 })
+Write-Host "MCP 선언: $($declaredMcp.Count)개 / 등록: $($declaredMcp.Count - $mcpMissing.Count)개"
+if ($mcpMissing.Count -gt 0) {
+    $problems += $mcpMissing.Count
+    Write-Section "[미등록] install-skills.ps1에 있지만 등록되지 않은 MCP ($($mcpMissing.Count)개)"
+    foreach ($n in $mcpMissing) { Write-Host "  - $n" -ForegroundColor Yellow }
+}
+
+if (Test-Path $ReadmePath) {
+    # MCP 표는 '## 설치되는 MCP' 섹션 안의 표 첫 칸
+    $mcpTable = @()
+    $inMcp = $false
+    foreach ($line in (Get-Content $ReadmePath -Encoding UTF8)) {
+        if ($line -match '^##\s') { $inMcp = $line -match '^##\s+설치되는 MCP'; continue }
+        if (-not $inMcp) { continue }
+        $m = [regex]::Match($line, '^\|\s*(?<name>[^\s|`-][^\s|`]*)\s*\|')
+        if ($m.Success -and $m.Groups['name'].Value -ne 'MCP') { $mcpTable += $m.Groups['name'].Value }
+    }
+    $mcpReadmeMissing = @($declaredMcp | Where-Object { $mcpTable -notcontains $_ })
+    $mcpReadmeExtra = @($mcpTable | Where-Object { $declaredMcp -notcontains $_ })
+    if ($mcpReadmeMissing.Count -gt 0 -or $mcpReadmeExtra.Count -gt 0) {
+        $problems += ($mcpReadmeMissing.Count + $mcpReadmeExtra.Count)
+        Write-Section '[README] MCP 표가 스크립트와 다름'
+        foreach ($n in $mcpReadmeMissing) { Write-Host "  - 표에 없음: $n" -ForegroundColor Yellow }
+        foreach ($n in $mcpReadmeExtra) { Write-Host "  - 표에만 있음: $n" -ForegroundColor Yellow }
+    }
+    foreach ($m in [regex]::Matches((Get-Content $ReadmePath -Raw -Encoding UTF8), '설치되는 MCP \((?<n>\d+)개\)')) {
+        if ([int]$m.Groups['n'].Value -ne $declaredMcp.Count) {
+            $problems++
+            Write-Section '[개수] 표기가 실제 개수와 다름'
+            Write-Host "  - README.md  '$($m.Value)' -> MCP $($declaredMcp.Count)개" -ForegroundColor Yellow
+        }
+    }
+}
+
 # --- 결과 ---
 Write-Host ''
 if ($problems -eq 0) {
-    Write-Host "일치합니다. 스킬 ${expected}개 · 플러그인 ${expectedPlugins}개가 스크립트·README·실제 설치 상태에서 모두 동일합니다." -ForegroundColor Green
+    Write-Host "일치합니다. 스킬 ${expected}개 · 플러그인 ${expectedPlugins}개 · MCP $($declaredMcp.Count)개가 스크립트·README·실제 설치 상태에서 모두 동일합니다." -ForegroundColor Green
     exit 0
 }
 Write-Host "불일치 $problems 건을 찾았습니다. 위 항목을 반영한 뒤 다시 실행하세요." -ForegroundColor Red

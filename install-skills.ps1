@@ -1,5 +1,5 @@
 ﻿# install-skills.ps1
-# Claude Code 전역 스킬 19개 · 플러그인 7개 일괄 설치 스크립트
+# Claude Code 전역 스킬 22개 · 플러그인 7개 · MCP 1개 일괄 설치 스크립트
 #
 # 사용법:
 #   powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
@@ -102,7 +102,7 @@ if (Test-Path $lockPath) {
 # 스킬 설치
 # ---------------------------------------------------------------------------
 Write-Host ''
-Write-Host 'Claude Code 스킬 19개 설치를 시작합니다...' -ForegroundColor Cyan
+Write-Host 'Claude Code 스킬 22개 설치를 시작합니다...' -ForegroundColor Cyan
 
 # --- Anthropic 공식 (anthropics/skills) ---
 Invoke-Step -Label 'mcp-builder'    -Action { npx skills add anthropics/skills --skill mcp-builder -g -y -a claude-code }
@@ -128,6 +128,9 @@ Invoke-Step -Label 'diagnosing-bugs'       -Action { npx skills add mattpocock/s
 Invoke-Step -Label 'archify'               -Action { npx skills add tt-a1i/archify --skill archify -g -y -a claude-code }
 Invoke-Step -Label 'archify-review'        -Action { npx skills add tt-a1i/archify --skill archify-review -g -y -a claude-code }
 Invoke-Step -Label 'impeccable'            -Action { npx skills add pbakaus/impeccable --skill impeccable -g -y -a claude-code }
+Invoke-Step -Label 'supabase-postgres-best-practices' -Action { npx skills add supabase/agent-skills --skill supabase-postgres-best-practices -g -y -a claude-code }
+Invoke-Step -Label 'supabase'              -Action { npx skills add supabase/agent-skills --skill supabase -g -y -a claude-code }
+Invoke-Step -Label 'security-audit'        -Action { npx skills add cloudflare/security-audit-skill --skill security-audit -g -y -a claude-code }
 
 # ---------------------------------------------------------------------------
 # 플러그인
@@ -157,6 +160,22 @@ Invoke-Step -Label 'claude-code-setup@claude-plugins-official' -Action { claude 
 Invoke-Step -Label 'caveman@caveman'                           -Action { claude plugin install caveman@caveman }
 
 # ---------------------------------------------------------------------------
+# MCP (user 범위 — 모든 프로젝트에서 사용)
+# ---------------------------------------------------------------------------
+# API 키는 여기 넣지 않는다. 필요하면 각 PC에서 따로 설정한다.
+# '--' 를 따옴표로 감싼다: Windows PowerShell 5.1 은 맨 '--' 를 지워서 claude 가 -y 를 자기 옵션으로 읽는다.
+# 이미 등록돼 있으면 add 가 오류를 내므로 get 으로 먼저 확인한다.
+Write-Host ''
+Write-Host 'MCP 1개 등록을 확인합니다...' -ForegroundColor Cyan
+
+claude mcp get context7 *> $null
+if ($LASTEXITCODE -ne 0) {
+    Invoke-Step -Label 'MCP context7' -Action { claude mcp add --scope user context7 '--' cmd /c npx -y @upstash/context7-mcp }
+} else {
+    Write-Host '  context7: 이미 등록됨' -ForegroundColor DarkGray
+}
+
+# ---------------------------------------------------------------------------
 # 결과
 # ---------------------------------------------------------------------------
 Write-Host ''
@@ -167,5 +186,5 @@ if ($failed.Count -eq 0) {
     foreach ($f in $failed) { Write-Host "  - $f" -ForegroundColor Yellow }
     Write-Host '  해당 줄만 다시 실행하면 됩니다.' -ForegroundColor DarkGray
 }
-Write-Host "확인: Get-ChildItem $HOME\.claude\skills / claude plugin list" -ForegroundColor Green
+Write-Host "확인: Get-ChildItem $HOME\.claude\skills / claude plugin list / claude mcp list" -ForegroundColor Green
 if ($failed.Count -gt 0) { exit 1 }

@@ -39,16 +39,17 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 ### 정상 결과
 
 ```
-스크립트 선언: 19개 / 실제 설치: 19개
+스크립트 선언: 22개 / 실제 설치: 22개
 플러그인 선언: 7개 / 실제 설치: 7개
+MCP 선언: 1개 / 등록: 1개
 
-일치합니다. 스킬 19개 · 플러그인 7개가 스크립트·README·실제 설치 상태에서 모두 동일합니다.
+일치합니다. 스킬 22개 · 플러그인 7개 · MCP 1개가 스크립트·README·실제 설치 상태에서 모두 동일합니다.
 ```
 
 플러그인이 7개가 안 되면 Claude Code를 한 번 재시작하고 verify를 다시 돌립니다
 (설치 직후 `installed_plugins.json` 반영이 늦을 수 있습니다).
 
-## 설치되는 스킬 (19개)
+## 설치되는 스킬 (22개)
 
 | 스킬 | 출처 | 용도 |
 | --- | --- | --- |
@@ -71,6 +72,12 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 | `archify` | `tt-a1i/archify` | 아키텍처·워크플로·시퀀스 다이어그램(HTML) |
 | `archify-review` | `tt-a1i/archify` | Archify 이슈·PR·코드 리뷰 |
 | `impeccable` | `pbakaus/impeccable` | 프런트엔드 UI 디자인·리디자인·비평·감사·다듬기 |
+| `supabase-postgres-best-practices` | `supabase/agent-skills` | Postgres 스키마·마이그레이션·RLS 정책·인덱스·쿼리 성능 모범사례 |
+| `supabase` | `supabase/agent-skills` | Supabase Auth·Edge Functions·Storage·CLI·RLS 문제 해결 |
+| `security-audit` | `cloudflare/security-audit-skill` | 코드베이스·API 보안 점검과 취약점 리뷰 |
+
+`pdf`·`docx`·`xlsx`·`pptx`(`anthropics/skills`)는 넣지 않았습니다. claude.ai 계정에 딸린
+`anthropic-skills` 로 이미 제공돼, 여기서 또 설치하면 같은 스킬이 두 벌 생깁니다.
 
 ## 설치되는 플러그인 (7개)
 
@@ -85,6 +92,17 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 | caveman@caveman | `JuliusBrussee/caveman` | 응답을 짧게 압축하는 모드 · cavecrew 서브에이전트 |
 
 플러그인 표 첫 칸에 백틱을 쓰지 않는 이유: `verify-skills.ps1` 이 백틱으로 시작하는 줄을 스킬로 센다.
+
+## 설치되는 MCP (1개)
+
+user 범위(`--scope user`)로 등록해 모든 프로젝트에서 씁니다.
+
+| MCP | 실행 명령 | 용도 |
+| --- | --- | --- |
+| context7 | `cmd /c npx -y @upstash/context7-mcp` | 라이브러리·프레임워크 최신 문서 조회 |
+
+API 키는 스크립트에 넣지 않습니다. 키 없이도 동작하며, 쓰려면 각 PC에서 따로 설정합니다.
+MCP 표 첫 칸에도 백틱을 쓰지 않습니다(스킬로 세지 않도록).
 
 ## 제거된 스킬과 이유
 
@@ -113,7 +131,7 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 
 ## 참고
 
-- 설치 후 확인: `Get-ChildItem $HOME\.claude\skills` · `claude plugin list`
+- 설치 후 확인: `Get-ChildItem $HOME\.claude\skills` · `claude plugin list` · `claude mcp list`
 - 개별 스킬만 다시 설치하려면 `install-skills.ps1`에서 해당 줄만 실행하면 됩니다.
 
 ## 검증
@@ -130,6 +148,7 @@ powershell -ExecutionPolicy Bypass -File .\verify-skills.ps1
 - **플러그인**: `~/.claude/plugins/installed_plugins.json` 과 대조 — 빠진 플러그인·설치 안 된 플러그인,
   그리고 **마켓플레이스 등록 줄(`claude plugin marketplace add`)이 빠진 플러그인**
   (새 PC에는 마켓이 등록돼 있지 않아 그 줄이 없으면 설치가 실패합니다)
-- **개수 표기**: 스크립트·README에 적힌 스킬·플러그인 개수
+- **MCP**: 스크립트의 `claude mcp add --scope user` 줄마다 `claude mcp get` 으로 등록 여부 확인, README MCP 표와 대조
+- **개수 표기**: 스크립트·README에 적힌 스킬·플러그인·MCP 개수
 
 일치하면 종료 코드 0, 어긋나면 1을 반환하므로 pre-commit 훅이나 CI에 그대로 걸 수 있습니다.
