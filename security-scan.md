@@ -17,7 +17,7 @@ HIGH·CRITICAL 발견은 해당 파일·줄을 직접 열어 확인했습니다.
 
 | 스킬 | 점수 | 등급 | 판단 | 확인 내용 |
 | --- | --- | --- | --- | --- |
-| archify | 100 | CRITICAL | 유지 · 일부 미검증 | YARA 16건은 예시 HTML 속 글꼴 데이터(`data:font/woff2;base64`). 인증 파일 2건은 `.netrc` 등을 **읽지 않으려는** 차단 목록. "경고 생략"은 문서 문장, 도구 인자는 오류 메시지 문자열. **`bin/archify.mjs`(288KB 번들)는 분석 미완료** |
+| archify | 100 | CRITICAL | 유지 | YARA 16건은 예시 HTML 속 글꼴 데이터(`data:font/woff2;base64`). 인증 파일 2건은 `.netrc` 등을 **읽지 않으려는** 차단 목록. "경고 생략"은 문서 문장, 도구 인자는 오류 메시지 문자열. 분석 미완료였던 `bin/archify.mjs` 는 따로 확인함(아래) |
 | design-taste-frontend | 100 | CRITICAL | 유지(오탐) | 숨은 지시 19건은 HTML 예시 속 `<script>` 태그, 분석 미완료 24건은 참조 문서 |
 | impeccable | 100 | CRITICAL | 유지(오탐) | 내부망 요청은 `localhost` 미리보기 서버, "경고 생략"은 "브라우저를 쓰지 말라"는 리뷰어 지시 |
 | mcp-builder | 100 | CRITICAL | 유지(오탐) | Anthropic 공식. 외부 전송은 예시 코드의 `api.example.com`, 인증 접근은 OAuth 설명 문서 |
@@ -40,6 +40,21 @@ HIGH·CRITICAL 발견은 해당 파일·줄을 직접 열어 확인했습니다.
 | tdd | 0 | LOW | 유지 | 발견 없음 |
 | web-design-guidelines | 0 | LOW | 유지 | 발견 없음 |
 
+### archify `bin/archify.mjs` 추가 확인 (2026-11-16)
+
+SkillSpector 가 크기(288,781바이트) 때문에 끝까지 분석하지 못한 파일을 따로 확인했습니다.
+
+| 항목 | 결과 |
+| --- | --- |
+| 파일 | `~/.claude/skills/archify/bin/archify.mjs` — Node.js ES 모듈, 7,289줄, 난독화·압축 없는 소스 |
+| SHA256 | `3cebcee3fa339e3b98deacae8cb9a5570525e003d8823368d304d904ba9ceecd` |
+| VirusTotal | 0/54 (직접 조회) |
+| 원본 대조 | `tt-a1i/archify` 최신판 `archify/bin/archify.mjs` 와 SHA256 일치. 빌드 산출물이 아니라 공개된 소스 그 자체 |
+| 자동 실행 | 없음. 훅이 없고, archify 스킬로 다이어그램을 만들 때 `node bin/archify.mjs finalize/guide/doctor/demo` 로만 실행 |
+| 네트워크 | 없음. 파일 안에 URL 이 없고, 스킬 폴더의 `.mjs`·`.js` 전체에 `fetch`·`http.request` 등 통신 코드 없음 |
+| 하는 일 | 같은 스킬 폴더의 렌더러를 Node 로 실행(`spawnSync(process.execPath, …)`), 자체 설정 환경변수(`ARCHIFY_*`)만 읽음 |
+| 판정 | **유지** |
+
 ## 플러그인 (설치 전 검사)
 
 | 플러그인 | 점수 | 등급 | 판단 | 확인 내용 |
@@ -49,5 +64,5 @@ HIGH·CRITICAL 발견은 해당 파일·줄을 직접 열어 확인했습니다.
 ## 남은 확인 사항
 
 - 51점 이상 스킬은 발견 유형별 대표 항목만 열어 봤습니다. 모든 발견을 하나씩 보지는 않았습니다.
-- "분석 미완료" 파일은 안전이 증명된 상태가 아닙니다. 특히 `archify` 의 `bin/archify.mjs`(288KB)는 실행되는 번들 파일입니다.
+- "분석 미완료" 파일은 안전이 증명된 상태가 아닙니다. `archify` 의 `bin/archify.mjs` 는 위처럼 따로 확인했고, 나머지 스킬의 분석 미완료 파일(대부분 참조 문서)은 따로 보지 않았습니다.
 - 공급망 검사(SC4)는 OSV.dev 연결에 실패해 오프라인 목록만 썼습니다(`archify` 결과에서 확인). 의존성 취약점 확인은 불완전합니다.
