@@ -327,6 +327,24 @@ foreach ($t in @(
     }
 }
 
+# --- 10. 전역 CLAUDE.md 규칙 ---
+# 저장소 claude-md\*.md 가 ~/.claude/CLAUDE.md 의 표시 구역에 그대로 들어가 있는지 (apply-claude-md.ps1 과 같은 형식)
+$claudeMd = Join-Path $HOME '.claude\CLAUDE.md'
+$utf8 = New-Object System.Text.UTF8Encoding $false
+$claudeText = if (Test-Path $claudeMd) { [System.IO.File]::ReadAllText($claudeMd, $utf8).Replace("`r`n", "`n") } else { '' }
+$ruleFiles = @(Get-ChildItem (Join-Path $root 'claude-md') -Filter *.md -ErrorAction SilentlyContinue)
+$ruleStale = @($ruleFiles | Where-Object {
+    $body = [System.IO.File]::ReadAllText($_.FullName, $utf8).TrimStart([char]0xFEFF).Replace("`r`n", "`n").Trim()
+    -not $claudeText.Contains("<!-- claude-skills-setup:$($_.BaseName) BEGIN -->`n$body`n<!-- claude-skills-setup:$($_.BaseName) END -->")
+})
+Write-Host "CLAUDE.md 규칙 선언: $($ruleFiles.Count)개 / 반영: $($ruleFiles.Count - $ruleStale.Count)개"
+if ($ruleStale.Count -gt 0) {
+    $problems += $ruleStale.Count
+    Write-Section "[CLAUDE.md] 전역 CLAUDE.md에 없거나 내용이 다른 규칙 ($($ruleStale.Count)개)"
+    foreach ($f in $ruleStale) { Write-Host "  - claude-md\$($f.Name)" -ForegroundColor Yellow }
+    Write-Host '  powershell -ExecutionPolicy Bypass -File .\apply-claude-md.ps1 로 반영한다.' -ForegroundColor DarkGray
+}
+
 # --- 결과 ---
 Write-Host ''
 if ($problems -eq 0) {

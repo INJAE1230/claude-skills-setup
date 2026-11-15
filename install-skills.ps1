@@ -237,6 +237,14 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # ---------------------------------------------------------------------------
+# 전역 CLAUDE.md 규칙
+# ---------------------------------------------------------------------------
+# claude-md\*.md 를 ~/.claude/CLAUDE.md 의 표시 구역에 넣거나 교체한다. 그 밖의 내용은 그대로 둔다.
+Write-Host ''
+Write-Host '전역 CLAUDE.md 규칙을 반영합니다...' -ForegroundColor Cyan
+Invoke-Step -Label '전역 CLAUDE.md 규칙' -Action { powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'apply-claude-md.ps1') }
+
+# ---------------------------------------------------------------------------
 # 결과
 # ---------------------------------------------------------------------------
 Write-Host ''

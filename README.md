@@ -187,6 +187,24 @@ Claude Code 입력창에서 `/watch:watch` 다음에 영상 주소나 파일 경
 제거 표 첫 칸에도 백틱을 쓰지 않습니다 — 위와 같은 이유로 `verify-skills.ps1` 이
 설치 대상 스킬로 오인합니다.
 
+## 전역 CLAUDE.md 규칙
+
+`claude-md\` 폴더의 `.md` 파일을 `~/.claude/CLAUDE.md`(모든 프로젝트에 적용되는 전역 설정)에 넣습니다.
+`install-skills.ps1` 이 `apply-claude-md.ps1` 을 불러 처리합니다.
+
+| 파일 | 내용 |
+| --- | --- |
+| claude-md\skill-reminders.md | 새 기능·앱·큰 구조 변경이면 grill-with-docs 제안, 긴 대화는 handoff 제안, 배포 전 인증·결제·개인정보 변경 시 security-audit 제안 |
+
+- 파일마다 `<!-- claude-skills-setup:<파일이름> BEGIN -->` ~ `END -->` 표시 사이에 들어갑니다.
+  다시 실행하면 **이 구역만 교체**하고, CLAUDE.md 의 다른 내용은 그대로 둡니다.
+- 바꾸기 전 원본은 `~/.claude/CLAUDE.md.bak` 으로 남습니다.
+- 규칙을 고치려면 저장소의 파일을 고치고 다시 반영합니다. CLAUDE.md 의 표시 구역 안을 직접 고치면 다음 실행 때 덮어써집니다.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\apply-claude-md.ps1
+```
+
 ## 참고
 
 - 설치 후 확인: `verify-skills.ps1` (Claude Code 재시작 뒤, 새 터미널에서)
@@ -208,6 +226,7 @@ powershell -ExecutionPolicy Bypass -File .\verify-skills.ps1
   (새 PC에는 마켓이 등록돼 있지 않아 그 줄이 없으면 설치가 실패합니다)
 - **MCP**: 스크립트의 `claude mcp add --scope user` 줄마다 `claude mcp get` 으로 등록 여부 확인, README MCP 표와 대조
 - **도구**: 스크립트의 `$requiredTools` 목록이 PATH 에 있는지 확인
+- **CLAUDE.md 규칙**: `claude-md\*.md` 가 전역 CLAUDE.md 표시 구역에 같은 내용으로 들어가 있는지 확인
 - **개수 표기**: 스크립트·README에 적힌 스킬·플러그인·MCP·도구 개수
 
 일치하면 종료 코드 0, 어긋나면 1을 반환하므로 pre-commit 훅이나 CI에 그대로 걸 수 있습니다.
