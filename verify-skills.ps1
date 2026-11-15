@@ -1,5 +1,5 @@
 ﻿# verify-skills.ps1
-# install-skills.ps1 / README.md 와 실제 설치된 스킬(~/.claude/skills)·플러그인(~/.claude/plugins)·MCP(user 범위)가
+# install-skills.ps1 / README.md 와 실제 설치된 스킬(~/.claude/skills)·플러그인(~/.claude/plugins)·MCP(user 범위)·도구(PATH)가
 # 일치하는지 검사한다.
 #
 # 사용법:
@@ -296,10 +296,41 @@ if (Test-Path $ReadmePath) {
     }
 }
 
+# --- 9. 도구 ---
+# 선언: install-skills.ps1 의 $requiredTools = @(...) 한 줄 · 실제: PATH 에서 찾기
+$declaredTools = @()
+$rt = [regex]::Match((Get-Content $ScriptPath -Raw -Encoding UTF8), '(?m)^\s*\$requiredTools\s*=\s*@\((?<list>[^)]*)\)')
+if ($rt.Success) {
+    $declaredTools = @([regex]::Matches($rt.Groups['list'].Value, "'(?<n>[^']+)'") | ForEach-Object { $_.Groups['n'].Value })
+}
+# winget 으로 막 깐 도구는 이 셸의 PATH 에 아직 없을 수 있어 레지스트리 값으로 다시 읽는다.
+$env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
+$toolMissing = @($declaredTools | Where-Object { -not (Get-Command $_ -ErrorAction SilentlyContinue) })
+Write-Host "도구 선언: $($declaredTools.Count)개 / 설치: $($declaredTools.Count - $toolMissing.Count)개"
+if ($toolMissing.Count -gt 0) {
+    $problems += $toolMissing.Count
+    Write-Section "[미설치] install-skills.ps1에 있지만 PATH에 없는 도구 ($($toolMissing.Count)개)"
+    foreach ($n in $toolMissing) { Write-Host "  - $n" -ForegroundColor Yellow }
+    Write-Host '  install-skills.ps1 을 다시 실행하거나, 새 터미널에서 verify 를 다시 돌린다.' -ForegroundColor DarkGray
+}
+foreach ($t in @(
+    @{ Path = $ScriptPath; Label = 'install-skills.ps1'; Pattern = '도구\s*(?<n>\d+)개' }
+    @{ Path = $ReadmePath; Label = 'README.md';          Pattern = '설치되는 도구 \((?<n>\d+)개\)' }
+)) {
+    if (-not (Test-Path $t.Path)) { continue }
+    foreach ($m in [regex]::Matches((Get-Content $t.Path -Raw -Encoding UTF8), $t.Pattern)) {
+        if ([int]$m.Groups['n'].Value -ne $declaredTools.Count) {
+            $problems++
+            Write-Section '[개수] 표기가 실제 개수와 다름'
+            Write-Host "  - $($t.Label)  '$($m.Value)' -> 도구 $($declaredTools.Count)개" -ForegroundColor Yellow
+        }
+    }
+}
+
 # --- 결과 ---
 Write-Host ''
 if ($problems -eq 0) {
-    Write-Host "일치합니다. 스킬 ${expected}개 · 플러그인 ${expectedPlugins}개 · MCP $($declaredMcp.Count)개가 스크립트·README·실제 설치 상태에서 모두 동일합니다." -ForegroundColor Green
+    Write-Host "일치합니다. 스킬 ${expected}개 · 플러그인 ${expectedPlugins}개 · MCP $($declaredMcp.Count)개 · 도구 $($declaredTools.Count)개가 스크립트·README·실제 설치 상태에서 모두 동일합니다." -ForegroundColor Green
     exit 0
 }
 Write-Host "불일치 $problems 건을 찾았습니다. 위 항목을 반영한 뒤 다시 실행하세요." -ForegroundColor Red

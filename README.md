@@ -1,6 +1,21 @@
 ﻿# claude-skills-setup
 
-새 PC나 새 환경에서 Claude Code 스킬·플러그인을 한 번에 복구하기 위한 설치 스크립트입니다.
+새 PC나 새 환경에서 Claude Code 스킬·플러그인·MCP·도구를 한 번에 복구하기 위한 설치 스크립트입니다.
+
+## 새 스킬·플러그인 추가 규칙
+
+**새 스킬이나 플러그인은 SkillSpector로 먼저 검사한 뒤에 추가합니다.**
+
+```powershell
+skillspector scan https://github.com/<owner>/<repo> --no-llm
+```
+
+- 점수만 보고 정하지 않습니다. `--no-llm` 은 문맥 없이 패턴만 찾아서 오탐이 많습니다
+  (Anthropic 공식 `mcp-builder`·`skill-creator` 도 100점이 나옵니다).
+- HIGH·CRITICAL 발견은 해당 파일·줄을 직접 열어 확인합니다. 설명 문서·예시·테스트 코드면 오탐,
+  실제로 비밀 파일을 읽어 외부로 보내거나 몰래 명령을 실행하면 추가하지 않습니다.
+- "분석 미완료(Incomplete referenced artifact analysis)"는 안전하다는 뜻이 아닙니다. 큰 번들 파일은 따로 봅니다.
+- 여러 스킬을 한 번에 `--recursive` 로 돌리면 보고서 크기 제한에 걸려 일부가 빠집니다. 하나씩 검사합니다.
 
 ## 사용법
 
@@ -9,8 +24,14 @@
 ### 실행 전 체크
 
 - **Claude Code와 VS Code를 닫습니다.** 스킬 디렉터리를 쓰는 중이면 충돌합니다.
-- `git`, Node.js(`npx`), `claude` CLI 가 설치돼 있어야 합니다. 없으면 해당 줄이
+- `git`, Node.js(`npx`), `claude` CLI, `winget` 이 설치돼 있어야 합니다. 없으면 해당 줄이
   실패 목록에 뜨고 종료 코드 1로 끝납니다(조용히 넘어가지 않습니다).
+- watch 의 음성 인식(로컬 WhisperX, 약 3GB)까지 깔려면 `-WithWhisper` 를 붙입니다.
+  붙이지 않으면 영상 자막만 씁니다. 한 번 깔린 PC는 이후 `-WithWhisper` 없이 돌려도 유지됩니다.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install-skills.ps1 -WithWhisper
+```
 
 ### 처음 세팅하는 PC
 
@@ -40,13 +61,14 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 
 ```
 스크립트 선언: 22개 / 실제 설치: 22개
-플러그인 선언: 7개 / 실제 설치: 7개
+플러그인 선언: 8개 / 실제 설치: 8개
 MCP 선언: 1개 / 등록: 1개
+도구 선언: 5개 / 설치: 5개
 
-일치합니다. 스킬 22개 · 플러그인 7개 · MCP 1개가 스크립트·README·실제 설치 상태에서 모두 동일합니다.
+일치합니다. 스킬 22개 · 플러그인 8개 · MCP 1개 · 도구 5개가 스크립트·README·실제 설치 상태에서 모두 동일합니다.
 ```
 
-플러그인이 7개가 안 되면 Claude Code를 한 번 재시작하고 verify를 다시 돌립니다
+플러그인이 8개가 안 되면 Claude Code를 한 번 재시작하고 verify를 다시 돌립니다
 (설치 직후 `installed_plugins.json` 반영이 늦을 수 있습니다).
 
 ## 설치되는 스킬 (22개)
@@ -79,7 +101,7 @@ MCP 선언: 1개 / 등록: 1개
 `pdf`·`docx`·`xlsx`·`pptx`(`anthropics/skills`)는 넣지 않았습니다. claude.ai 계정에 딸린
 `anthropic-skills` 로 이미 제공돼, 여기서 또 설치하면 같은 스킬이 두 벌 생깁니다.
 
-## 설치되는 플러그인 (7개)
+## 설치되는 플러그인 (8개)
 
 | 플러그인 | 마켓플레이스 | 용도 |
 | --- | --- | --- |
@@ -90,6 +112,7 @@ MCP 선언: 1개 / 등록: 1개
 | prompts.chat@prompts.chat | `f/prompts.chat` | prompts.chat 프롬프트·스킬 검색·저장 |
 | claude-code-setup@claude-plugins-official | `anthropics/claude-plugins-official` | 코드베이스 분석 후 훅·스킬·MCP 자동화 추천 |
 | caveman@caveman | `JuliusBrussee/caveman` | 응답을 짧게 압축하는 모드 · cavecrew 서브에이전트 |
+| watch@claude-video | `bradautomates/claude-video` | 영상(URL·파일)을 장면 이미지와 자막·음성 인식 텍스트로 바꿔 분석 |
 
 플러그인 표 첫 칸에 백틱을 쓰지 않는 이유: `verify-skills.ps1` 이 백틱으로 시작하는 줄을 스킬로 센다.
 
@@ -103,6 +126,38 @@ user 범위(`--scope user`)로 등록해 모든 프로젝트에서 씁니다.
 
 API 키는 스크립트에 넣지 않습니다. 키 없이도 동작하며, 쓰려면 각 PC에서 따로 설정합니다.
 MCP 표 첫 칸에도 백틱을 쓰지 않습니다(스킬로 세지 않도록).
+
+## 설치되는 도구 (5개)
+
+없는 것만 `winget`(skillspector 는 `uv`)으로 설치합니다. watch 용 Python 3.10 이상도 없으면 설치합니다.
+
+| 도구 | 설치 방법 | 용도 |
+| --- | --- | --- |
+| uv | `winget install astral-sh.uv` | skillspector 설치 |
+| skillspector | `uv tool install git+https://github.com/NVIDIA/skillspector.git` | 스킬·플러그인 보안 검사 |
+| ffmpeg | `winget install Gyan.FFmpeg` | watch: 장면 추출·오디오 변환 |
+| yt-dlp | `winget install yt-dlp.yt-dlp` | watch: 영상·자막 내려받기 |
+| deno | `winget install DenoLand.Deno` | watch: yt-dlp 의 유튜브 처리 |
+
+## watch 사용법
+
+Claude Code 입력창에서 `/watch:watch` 다음에 영상 주소나 파일 경로와 질문을 씁니다.
+
+```
+/watch:watch https://www.youtube.com/watch?v=영상ID 이 영상 핵심 3줄로 요약해줘
+/watch:watch C:\Users\tnvjf\Videos\화면녹화.mp4 3분쯤 에러 메시지가 뭐야?
+```
+
+- 유튜브 등 URL: 자막이 있으면 자막을 쓰고, 없으면 음성 인식(WhisperX)을 씁니다.
+- 화면 녹화 mp4 같은 로컬 파일: 경로를 그대로 붙여 넣습니다. 장면 이미지와 음성 인식 결과를 봅니다.
+- 10분 이하 영상이나 특정 구간을 물어볼 때 가장 정확합니다.
+
+설정 파일은 `~/.config/watch/.env` 입니다. 스크립트가 아래처럼 고정합니다.
+
+- `WATCH_ENGINE=local` — 영상을 Google(Gemini)로 올리지 않습니다. 기본값 `auto` 는 환경변수나
+  **작업 폴더의 `.env`** 에 `GEMINI_API_KEY` 가 있으면 자동으로 클라우드를 씁니다.
+- `WATCH_WHISPER_BACKEND=whisperx`(`-WithWhisper`) 또는 `none`(자막만) — Groq·OpenAI 키를 쓰지 않습니다.
+- 로그인이 필요한 영상(인스타 등)용 쿠키 설정(`--cookies-from-browser`)은 넣지 않았습니다.
 
 ## 제거된 스킬과 이유
 
@@ -131,7 +186,7 @@ MCP 표 첫 칸에도 백틱을 쓰지 않습니다(스킬로 세지 않도록).
 
 ## 참고
 
-- 설치 후 확인: `Get-ChildItem $HOME\.claude\skills` · `claude plugin list` · `claude mcp list`
+- 설치 후 확인: `verify-skills.ps1` (Claude Code 재시작 뒤, 새 터미널에서)
 - 개별 스킬만 다시 설치하려면 `install-skills.ps1`에서 해당 줄만 실행하면 됩니다.
 
 ## 검증
@@ -149,6 +204,7 @@ powershell -ExecutionPolicy Bypass -File .\verify-skills.ps1
   그리고 **마켓플레이스 등록 줄(`claude plugin marketplace add`)이 빠진 플러그인**
   (새 PC에는 마켓이 등록돼 있지 않아 그 줄이 없으면 설치가 실패합니다)
 - **MCP**: 스크립트의 `claude mcp add --scope user` 줄마다 `claude mcp get` 으로 등록 여부 확인, README MCP 표와 대조
-- **개수 표기**: 스크립트·README에 적힌 스킬·플러그인·MCP 개수
+- **도구**: 스크립트의 `$requiredTools` 목록이 PATH 에 있는지 확인
+- **개수 표기**: 스크립트·README에 적힌 스킬·플러그인·MCP·도구 개수
 
 일치하면 종료 코드 0, 어긋나면 1을 반환하므로 pre-commit 훅이나 CI에 그대로 걸 수 있습니다.

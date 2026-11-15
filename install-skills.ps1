@@ -1,8 +1,10 @@
 ﻿# install-skills.ps1
-# Claude Code 전역 스킬 22개 · 플러그인 7개 · MCP 1개 일괄 설치 스크립트
+# Claude Code 전역 스킬 22개 · 플러그인 8개 · MCP 1개 · 도구 5개 일괄 설치 스크립트
 #
 # 사용법:
 #   powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
+#   powershell -ExecutionPolicy Bypass -File .\install-skills.ps1 -WithWhisper
+#     -WithWhisper: watch 플러그인의 로컬 음성 인식(WhisperX, 약 3GB)까지 설치
 #
 # 옵션 설명:
 #   -g              전역(~/.claude/skills)에 설치
@@ -11,6 +13,8 @@
 #
 # 한 줄이 실패해도 중단하지 않는다. 실패한 항목은 끝에 모아서 보여주고,
 # 하나라도 실패하면 종료 코드 1로 끝난다.
+
+param([switch]$WithWhisper)
 
 $ErrorActionPreference = 'Continue'
 $failed = @()
@@ -99,6 +103,45 @@ if (Test-Path $lockPath) {
 }
 
 # ---------------------------------------------------------------------------
+# 도구
+# ---------------------------------------------------------------------------
+# skillspector: 새 스킬·플러그인을 추가하기 전에 보안 검사하는 도구 (NVIDIA)
+# ffmpeg·yt-dlp·deno: watch 플러그인이 영상을 받고 장면을 뽑는 데 쓴다
+# 없는 것만 설치한다. winget 은 PATH 를 현재 셸에 반영하지 않아 설치 뒤 다시 읽는다.
+# verify-skills.ps1 이 아래 $requiredTools 줄을 정규식으로 읽는다. 한 줄 형태를 유지할 것.
+$requiredTools = @('uv', 'ffmpeg', 'yt-dlp', 'deno', 'skillspector')
+$wingetIds = @{ 'uv' = 'astral-sh.uv'; 'ffmpeg' = 'Gyan.FFmpeg'; 'yt-dlp' = 'yt-dlp.yt-dlp'; 'deno' = 'DenoLand.Deno' }
+
+function Update-PathFromRegistry {
+    $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
+}
+
+Write-Host ''
+Write-Host '도구를 확인합니다...' -ForegroundColor Cyan
+
+# watch 는 Python 3.10 이상이 필요하다. Microsoft Store 의 가짜 python 별칭은 여기서 걸러진다.
+python -c "import sys; sys.exit(sys.version_info < (3, 10))" *> $null
+if ($LASTEXITCODE -ne 0) {
+    Invoke-Step -Label 'Python 3.12 (winget)' -Action { winget install --id Python.Python.3.12 -e --silent --accept-source-agreements --accept-package-agreements --disable-interactivity }
+    Update-PathFromRegistry
+}
+
+foreach ($tool in $requiredTools) {
+    if (Get-Command $tool -ErrorAction SilentlyContinue) {
+        Write-Host "  ${tool}: 이미 있음" -ForegroundColor DarkGray
+        continue
+    }
+    if ($wingetIds.ContainsKey($tool)) {
+        $id = $wingetIds[$tool]
+        Invoke-Step -Label "$tool (winget $id)" -Action { winget install --id $id -e --silent --accept-source-agreements --accept-package-agreements --disable-interactivity }
+    } else {
+        # skillspector: PyPI 에 없어 GitHub 저장소에서 바로 설치한다. uv 가 위에서 먼저 깔린다.
+        Invoke-Step -Label 'skillspector (uv)' -Action { uv tool install git+https://github.com/NVIDIA/skillspector.git }
+    }
+    Update-PathFromRegistry
+}
+
+# ---------------------------------------------------------------------------
 # 스킬 설치
 # ---------------------------------------------------------------------------
 Write-Host ''
@@ -147,9 +190,10 @@ Invoke-Step -AllowFailure -Label '마켓 DietrichGebert/ponytail'            -Ac
 Invoke-Step -AllowFailure -Label '마켓 thedotmack/claude-mem'              -Action { claude plugin marketplace add thedotmack/claude-mem }
 Invoke-Step -AllowFailure -Label '마켓 f/prompts.chat'                     -Action { claude plugin marketplace add f/prompts.chat }
 Invoke-Step -AllowFailure -Label '마켓 JuliusBrussee/caveman'              -Action { claude plugin marketplace add JuliusBrussee/caveman }
+Invoke-Step -AllowFailure -Label '마켓 bradautomates/claude-video'         -Action { claude plugin marketplace add bradautomates/claude-video }
 
 Write-Host ''
-Write-Host '플러그인 7개 설치를 시작합니다...' -ForegroundColor Cyan
+Write-Host '플러그인 8개 설치를 시작합니다...' -ForegroundColor Cyan
 
 Invoke-Step -Label 'vercel@claude-plugins-official'            -Action { claude plugin install vercel@claude-plugins-official }
 Invoke-Step -Label 'humanize-korean@im-not-ai'                 -Action { claude plugin install humanize-korean@im-not-ai }
@@ -158,6 +202,23 @@ Invoke-Step -Label 'claude-mem@thedotmack'                     -Action { claude 
 Invoke-Step -Label 'prompts.chat@prompts.chat'                 -Action { claude plugin install prompts.chat@prompts.chat }
 Invoke-Step -Label 'claude-code-setup@claude-plugins-official' -Action { claude plugin install claude-code-setup@claude-plugins-official }
 Invoke-Step -Label 'caveman@caveman'                           -Action { claude plugin install caveman@caveman }
+Invoke-Step -Label 'watch@claude-video'                        -Action { claude plugin install watch@claude-video }
+
+# --- watch 설정: 항상 로컬 엔진 ---
+# 기본값 auto 는 환경변수나 작업 폴더 .env 에 GEMINI/GROQ/OPENAI 키가 있으면 영상·음성을
+# 클라우드로 올린다. engine=local 로 고정하고, 음성 인식은 WhisperX(로컬) 또는 none(자막만).
+# 이미 WhisperX 를 깐 PC 에서 -WithWhisper 없이 다시 돌려도 none 으로 되돌리지 않는다.
+$watchSetup = Get-ChildItem "$HOME\.claude\plugins\cache\claude-video\watch\*\skills\watch\scripts\setup.py" -ErrorAction SilentlyContinue |
+    Sort-Object LastWriteTime | Select-Object -Last 1 -ExpandProperty FullName
+if (-not $watchSetup) {
+    $failed += 'watch 설정: setup.py 를 찾을 수 없음 (watch@claude-video 설치 실패?)'
+} elseif ($WithWhisper -or (Test-Path "$HOME\.cache\watch\whisperx-venv\.deps-ok")) {
+    Write-Host '  watch: 로컬 WhisperX 설치·설정 (처음에는 약 3GB 내려받음)' -ForegroundColor DarkGray
+    Invoke-Step -Label 'watch WhisperX' -Action { python $watchSetup --install-whisperx --backend whisperx --engine local --detail balanced }
+} else {
+    Write-Host '  watch: 자막만 사용 (음성 인식은 -WithWhisper 로 설치)' -ForegroundColor DarkGray
+    Invoke-Step -Label 'watch 설정' -Action { python $watchSetup --backend none --engine local --detail balanced }
+}
 
 # ---------------------------------------------------------------------------
 # MCP (user 범위 — 모든 프로젝트에서 사용)
@@ -186,5 +247,5 @@ if ($failed.Count -eq 0) {
     foreach ($f in $failed) { Write-Host "  - $f" -ForegroundColor Yellow }
     Write-Host '  해당 줄만 다시 실행하면 됩니다.' -ForegroundColor DarkGray
 }
-Write-Host "확인: Get-ChildItem $HOME\.claude\skills / claude plugin list / claude mcp list" -ForegroundColor Green
+Write-Host '확인: powershell -ExecutionPolicy Bypass -File .\verify-skills.ps1  (Claude Code 재시작 후)' -ForegroundColor Green
 if ($failed.Count -gt 0) { exit 1 }
