@@ -16,6 +16,7 @@ skillspector scan https://github.com/<owner>/<repo> --no-llm
   실제로 비밀 파일을 읽어 외부로 보내거나 몰래 명령을 실행하면 추가하지 않습니다.
 - "분석 미완료(Incomplete referenced artifact analysis)"는 안전하다는 뜻이 아닙니다. 큰 번들 파일은 따로 봅니다.
 - 여러 스킬을 한 번에 `--recursive` 로 돌리면 보고서 크기 제한에 걸려 일부가 빠집니다. 하나씩 검사합니다.
+- 검사 결과는 [security-scan.md](security-scan.md) 에 기록합니다(원본 JSON은 올리지 않음).
 
 ## 사용법
 
