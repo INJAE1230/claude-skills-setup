@@ -2,7 +2,7 @@
 
 - **검사일:** 2026-11-16
 - **도구:** NVIDIA SkillSpector v2.12.0, `--no-llm`(정적 패턴 분석만)
-- **대상:** `~/.claude/skills` 의 스킬 22개(하나씩 검사), watch 플러그인(`bradautomates/claude-video`, 설치 전 검사)
+- **대상:** `~/.claude/skills` 의 스킬 24개(하나씩 검사), watch 플러그인(`bradautomates/claude-video`, 설치 전 검사)
 - **원본 JSON:** 저장소에 올리지 않음
 
 ## 판단 기준
@@ -30,10 +30,12 @@ HIGH·CRITICAL 발견은 해당 파일·줄을 직접 열어 확인했습니다.
 | webapp-testing | 49 | MEDIUM | 유지 | subprocess 는 테스트 서버 실행 |
 | diagnosing-bugs | 27 | MEDIUM | 유지 | 프롬프트 추출 1건 |
 | accessibility-compliance | 25 | MEDIUM | 유지 | 참조 문서 분석 미완료 1건 |
+| grilling | 8 | LOW | 유지(오탐) | 자율 결정(EA2) 1건은 "사실 조사는 서브에이전트가, **결정은 사용자에게 묻고 기다린다**"는 문장(`SKILL.md:28`). 실행 파일 없음 (2026-11-16 추가 검사) |
 | ux-heuristics | 7 | LOW | 유지 | |
 | agent-browser | 0 | LOW | 유지 | 발견 없음 |
 | archify-review | 0 | LOW | 유지 | 발견 없음 |
 | design-md | 0 | LOW | 유지 | 발견 없음 |
+| domain-modeling | 0 | LOW | 유지 | 발견 없음. 실행 파일 없음, 마크다운 문서만 (2026-11-16 추가 검사) |
 | grill-with-docs | 0 | LOW | 유지 | 발견 없음 |
 | handoff | 0 | LOW | 유지 | 발견 없음 |
 | supabase-postgres-best-practices | 0 | LOW | 유지 | 발견 없음 |
