@@ -63,18 +63,18 @@ on this system.` 으로 거부됩니다. `powershell -ExecutionPolicy Bypass -Fi
 ### 정상 결과
 
 ```
-스크립트 선언: 22개 / 실제 설치: 22개
+스크립트 선언: 24개 / 실제 설치: 24개
 플러그인 선언: 8개 / 실제 설치: 8개
 MCP 선언: 1개 / 등록: 1개
 도구 선언: 5개 / 설치: 5개
 
-일치합니다. 스킬 22개 · 플러그인 8개 · MCP 1개 · 도구 5개가 스크립트·README·실제 설치 상태에서 모두 동일합니다.
+일치합니다. 스킬 24개 · 플러그인 8개 · MCP 1개 · 도구 5개가 스크립트·README·실제 설치 상태에서 모두 동일합니다.
 ```
 
 플러그인이 8개가 안 되면 Claude Code를 한 번 재시작하고 verify를 다시 돌립니다
 (설치 직후 `installed_plugins.json` 반영이 늦을 수 있습니다).
 
-## 설치되는 스킬 (22개)
+## 설치되는 스킬 (24개)
 
 | 스킬 | 출처 | 용도 |
 | --- | --- | --- |
@@ -92,6 +92,8 @@ MCP 선언: 1개 / 등록: 1개
 | `ux-heuristics` | `wondelai/skills` | 닐슨 휴리스틱 기반 사용성 점검 |
 | `handoff` | `mattpocock/skills` | 작업 인수인계 문서 작성 |
 | `grill-with-docs` | `mattpocock/skills` | 계획·설계를 집요하게 캐물어 다듬고 ADR·용어집 작성 |
+| `grilling` | `mattpocock/skills` | 계획·결정을 캐묻는 인터뷰 (grill-with-docs 하위 스킬) |
+| `domain-modeling` | `mattpocock/skills` | 용어집(GLOSSARY.md)·ADR 작성 (grill-with-docs 하위 스킬) |
 | `tdd` | `mattpocock/skills` | 테스트 우선(레드-그린-리팩터) 개발 |
 | `diagnosing-bugs` | `mattpocock/skills` | 어려운 버그·성능 회귀 진단 루프 |
 | `archify` | `tt-a1i/archify` | 아키텍처·워크플로·시퀀스 다이어그램(HTML) |

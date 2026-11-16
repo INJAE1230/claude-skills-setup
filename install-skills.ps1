@@ -1,5 +1,5 @@
 ﻿# install-skills.ps1
-# Claude Code 전역 스킬 22개 · 플러그인 8개 · MCP 1개 · 도구 5개 일괄 설치 스크립트
+# Claude Code 전역 스킬 24개 · 플러그인 8개 · MCP 1개 · 도구 5개 일괄 설치 스크립트
 #
 # 사용법:
 #   powershell -ExecutionPolicy Bypass -File .\install-skills.ps1
@@ -145,7 +145,7 @@ foreach ($tool in $requiredTools) {
 # 스킬 설치
 # ---------------------------------------------------------------------------
 Write-Host ''
-Write-Host 'Claude Code 스킬 22개 설치를 시작합니다...' -ForegroundColor Cyan
+Write-Host 'Claude Code 스킬 24개 설치를 시작합니다...' -ForegroundColor Cyan
 
 # --- Anthropic 공식 (anthropics/skills) ---
 Invoke-Step -Label 'mcp-builder'    -Action { npx skills add anthropics/skills --skill mcp-builder -g -y -a claude-code }
@@ -166,6 +166,9 @@ Invoke-Step -Label 'design-md'             -Action { npx skills add nexu-io/open
 Invoke-Step -Label 'ux-heuristics'         -Action { npx skills add wondelai/skills --skill ux-heuristics -g -y -a claude-code }
 Invoke-Step -Label 'handoff'               -Action { npx skills add mattpocock/skills --skill handoff -g -y -a claude-code }
 Invoke-Step -Label 'grill-with-docs'       -Action { npx skills add mattpocock/skills --skill grill-with-docs -g -y -a claude-code }
+# grill-with-docs 가 실행 중에 부르는 하위 스킬. 없으면 grill-with-docs 가 중간에 막힌다.
+Invoke-Step -Label 'grilling'              -Action { npx skills add mattpocock/skills --skill grilling -g -y -a claude-code }
+Invoke-Step -Label 'domain-modeling'       -Action { npx skills add mattpocock/skills --skill domain-modeling -g -y -a claude-code }
 Invoke-Step -Label 'tdd'                   -Action { npx skills add mattpocock/skills --skill tdd -g -y -a claude-code }
 Invoke-Step -Label 'diagnosing-bugs'       -Action { npx skills add mattpocock/skills --skill diagnosing-bugs -g -y -a claude-code }
 Invoke-Step -Label 'archify'               -Action { npx skills add tt-a1i/archify --skill archify -g -y -a claude-code }

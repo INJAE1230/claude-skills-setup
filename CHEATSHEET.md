@@ -1,6 +1,6 @@
 # 사용법 치트시트
 
-설치된 스킬 22개 · 플러그인 8개 · MCP 1개를 언제, 어떻게 부르는지 정리한 표입니다.
+설치된 스킬 24개 · 플러그인 8개 · MCP 1개를 언제, 어떻게 부르는지 정리한 표입니다.
 각 `SKILL.md` 의 `description` 과 `disable-model-invocation`, 플러그인의 `hooks` 설정을 직접 확인해 만들었습니다(2026-11-16).
 
 ## 분류
@@ -13,11 +13,13 @@
 
 플러그인 안의 스킬은 `/플러그인:스킬` 형태로 부릅니다(예: `/watch:watch`, `/ponytail:ponytail-review`).
 
-## 스킬 (22개)
+## 스킬 (24개)
 
 | 이름 | 분류 | 언제 쓰나 | 부르는 법 |
 | --- | --- | --- | --- |
 | grill-with-docs | ② 명령어 | 계획·설계를 집요하게 캐물어 다듬고 ADR·용어집까지 만들 때 | `/grill-with-docs 이 결제 기능 설계 검토해줘` |
+| grilling | ① 자동 | 계획·결정을 집요하게 캐물어 검증할 때 (grill-with-docs 가 내부에서 부름) | "이 계획 grill 해줘" · `/grilling` |
+| domain-modeling | ① 자동 | 용어집(GLOSSARY.md)·ADR 을 쓰거나 고칠 때 (grill-with-docs 가 내부에서 부름) | "이 용어 GLOSSARY.md 에 정리해줘" · `/domain-modeling` |
 | handoff | ② 명령어 | 대화를 요약해 다른 세션·에이전트에 넘길 인수인계 문서를 만들 때 | `/handoff` |
 | accessibility-compliance | ① 자동 | WCAG 2.2 접근성 점검, ARIA·스크린리더 대응 | "이 폼 접근성 점검해줘" · `/accessibility-compliance` |
 | agent-browser | ① 자동 | 웹사이트 열기·클릭·폼 입력·스크린샷 등 브라우저 자동화 | "이 사이트 열어서 로그인 화면 스크린샷 찍어줘" · `/agent-browser` |
