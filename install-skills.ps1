@@ -136,7 +136,10 @@ foreach ($tool in $requiredTools) {
         Invoke-Step -Label "$tool (winget $id)" -Action { winget install --id $id -e --silent --accept-source-agreements --accept-package-agreements --disable-interactivity }
     } else {
         # skillspector: PyPI 에 없어 GitHub 저장소에서 바로 설치한다. uv 가 위에서 먼저 깔린다.
-        Invoke-Step -Label 'skillspector (uv)' -Action { uv tool install git+https://github.com/NVIDIA/skillspector.git }
+        # --python 3.13: 의존성 yara-python 4.5.4 는 Windows wheel 이 cp313 까지만 있다. uv 가 3.14 를 고르면
+        # 소스 빌드로 넘어가 MSVC(C++ Build Tools) 없이 실패한다. 3.13 이 없으면 uv 가 내려받는다.
+        # ponytail: 버전 고정. yara-python 이 cp314 wheel 을 내면 이 옵션을 뺀다.
+        Invoke-Step -Label 'skillspector (uv)' -Action { uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git }
     }
     Update-PathFromRegistry
 }
